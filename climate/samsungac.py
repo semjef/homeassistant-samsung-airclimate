@@ -21,7 +21,7 @@ from homeassistant.const import (
     TEMP_CELSIUS, TEMP_FAHRENHEIT)
 
 REQUIREMENTS = [
-    'https://github.com/semjef/samsungac/archive/0.4.zip#samsungac==0.4']
+    'https://github.com/semjef/samsungac/archive/0.6.6.zip#samsungac==0.6.6']
 _LOGGER = logging.getLogger(__name__)
 
 SUPPORT_FLAGS = (SUPPORT_TARGET_TEMPERATURE |
@@ -31,8 +31,6 @@ SUPPORT_FLAGS = (SUPPORT_TARGET_TEMPERATURE |
                  SUPPORT_ON_OFF)
 
 CONF_CERT_FILE = 'cert'
-
-STATE_WIND = 'wind'
 
 HA_STATE_TO_SAMSUNG = {
     STATE_AUTO: 'Auto',
@@ -96,6 +94,8 @@ class SamsungClimate(ClimateDevice):
         self._temperature_max = None
 
         self._current_operation = None
+        self._current_fan = None
+        self._current_swing = None
 
         self._list = {
             ATTR_OPERATION_MODE: list(
@@ -177,7 +177,7 @@ class SamsungClimate(ClimateDevice):
         """Set new target temperature."""
         value = kwargs.get(ATTR_TEMPERATURE)
         if value is None:
-            continue
+            return
         try:
             temp = str(int(value))
         except ValueError:
@@ -192,12 +192,12 @@ class SamsungClimate(ClimateDevice):
     @property
     def fan_list(self):
         """Return the list of available fan modes."""
-        return None
+        return self._list.get(ATTR_FAN_MODE)
 
     @property
     def swing_list(self):
         """Return the list of available swing modes."""
-        return None
+        return self._list.get(ATTR_SWING_MODE)
 
     @property
     def current_operation(self):
@@ -225,15 +225,15 @@ class SamsungClimate(ClimateDevice):
 
     def set_operation_mode(self, operation_mode):
         """Set new target operation mode."""
-        self._api.set_mode(HA_STATE_TO_SAMSUNG[operation_mode])
+        self._api.set_mode(HA_STATE_TO_SAMSUNG[operation_mode.lower()])
 
-    def set_fan_mode(self, operation_mode):
-        """Set new target operation mode."""
-        self._api.set_speed(HA_FAN_TO_SAMSUNG[operation_mode])
+    def set_fan_mode(self, fan_mode):
+        """Set new target fan mode."""
+        self._api.set_speed(HA_FAN_TO_SAMSUNG[fan_mode.title()])
 
-    def set_swing_mode(self, operation_mode):
-        """Set new target operation mode."""
-        self._api.set_direction(HA_SWING_TO_SAMSUNG[operation_mode])
+    def set_swing_mode(self, swing_mode):
+        """Set new target swing operation."""
+        self._api.set_direction(HA_SWING_TO_SAMSUNG[swing_mode.title()])
 
     def update(self):
         data = self._api.get()
