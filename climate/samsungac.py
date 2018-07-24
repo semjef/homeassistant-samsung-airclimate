@@ -9,7 +9,7 @@ import voluptuous as vol
 import homeassistant.helpers.config_validation as cv
 from homeassistant.util.temperature import convert as convert_temperature
 from homeassistant.components.climate import (
-    ATTR_TARGET_TEMP_HIGH, ATTR_TARGET_TEMP_LOW, DOMAIN,
+    ATTR_FAN_MODE, ATTR_SWING_MODE, DOMAIN,
     ClimateDevice, PLATFORM_SCHEMA, STATE_DRY, STATE_AUTO,
     STATE_COOL, STATE_FAN_ONLY, STATE_HEAT, SUPPORT_TARGET_TEMPERATURE,
     SUPPORT_ON_OFF, SUPPORT_TARGET_TEMPERATURE_LOW,
@@ -39,10 +39,28 @@ HA_STATE_TO_SAMSUNG = {
     STATE_COOL: 'Cool',
     STATE_DRY: 'Dry',
     STATE_FAN_ONLY: 'Wind',
-    STATE_HEAT: 'Heat',
+    STATE_HEAT: 'Heat'
+}
+
+HA_FAN_TO_SAMSUNG = {
+    'Auto': 0,
+    'Low': 1,
+    'Mid': 2,
+    'High': 3,
+    'Turbo': 4
+}
+
+HA_SWING_TO_SAMSUNG = {
+    # TODO: need correct values
+    'Fix': 'Fix',
+    'SwingUD': 'SwingUD',
+    'SwingLR': 'SwingLR',
+    'Rotation': 'Rotation'
 }
 
 SAMSUNG_TO_HA_STATE = {c: s for s, c in HA_STATE_TO_SAMSUNG.items()}
+SAMSUNG_TO_HA_FAN = {c: s for s, c in HA_FAN_TO_SAMSUNG.items()}
+SAMSUNG_TO_HA_SWING = {c: s for s, c in HA_SWING_TO_SAMSUNG.items()}
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Required(CONF_IP_ADDRESS): cv.string,
@@ -82,6 +100,12 @@ class SamsungClimate(ClimateDevice):
         self._list = {
             ATTR_OPERATION_MODE: list(
                 map(str.title, set(HA_STATE_TO_SAMSUNG.values()))
+            ),
+            ATTR_FAN_MODE: list(
+                map(str.title, set(HA_FAN_TO_SAMSUNG.keys()))
+            ),
+            ATTR_SWING_MODE: list(
+                map(str.title, set(HA_SWING_TO_SAMSUNG.keys()))
             ),
         }
 
@@ -183,6 +207,22 @@ class SamsungClimate(ClimateDevice):
         else:
             return STATE_UNKNOWN
 
+    @property
+    def current_fan_mode(self):
+        """Return the fan setting."""
+        if self._current_fan in SAMSUNG_TO_HA_FAN:
+            return SAMSUNG_TO_HA_FAN[self._current_fan]
+        else:
+            return STATE_UNKNOWN
+
+    @property
+    def current_swing_mode(self):
+        """Return the fan setting."""
+        if self._current_swing in SAMSUNG_TO_HA_SWING:
+            return SAMSUNG_TO_HA_SWING[self._current_swing]
+        else:
+            return STATE_UNKNOWN
+
     def set_operation_mode(self, operation_mode):
         """Set new target operation mode."""
         self._api.set_mode(HA_STATE_TO_SAMSUNG[operation_mode])
@@ -204,3 +244,6 @@ class SamsungClimate(ClimateDevice):
         self._temperature_max = data['Device']['Temperatures'][0]['maximum']
 
         self._current_operation = data['Device']['Mode']['modes'][0].title()
+
+        self._current_swing = data['Device']['Wind']['direction'].title()
+        self._current_fan = int(data['Device']['Wind']['speedLevel'])
