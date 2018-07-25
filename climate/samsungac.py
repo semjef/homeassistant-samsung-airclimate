@@ -33,27 +33,27 @@ SUPPORT_FLAGS = (SUPPORT_TARGET_TEMPERATURE |
 CONF_CERT_FILE = 'cert'
 
 HA_STATE_TO_SAMSUNG = {
-    STATE_AUTO: 'Auto',
-    STATE_COOL: 'Cool',
-    STATE_DRY: 'Dry',
-    STATE_FAN_ONLY: 'Wind',
-    STATE_HEAT: 'Heat'
+    STATE_AUTO: 'auto',
+    STATE_COOL: 'cool',
+    STATE_DRY: 'dry',
+    STATE_FAN_ONLY: 'wind',
+    STATE_HEAT: 'heat'
 }
 
 HA_FAN_TO_SAMSUNG = {
-    'Auto': 0,
-    'Low': 1,
-    'Mid': 2,
-    'High': 3,
-    'Turbo': 4
+    'auto': 0,
+    'low': 1,
+    'mid': 2,
+    'high': 3,
+    'turbo': 4
 }
 
 HA_SWING_TO_SAMSUNG = {
     # TODO: need correct values
-    'Fix': 'Fix',
-    'SwingUD': 'SwingUD',
-    'SwingLR': 'SwingLR',
-    'Rotation': 'Rotation'
+    'fix': 'fix',
+    'swingud': 'swingud',
+    'swinglr': 'swinglr',
+    'rotation': 'rotation'
 }
 
 SAMSUNG_TO_HA_STATE = {c: s for s, c in HA_STATE_TO_SAMSUNG.items()}
@@ -229,11 +229,11 @@ class SamsungClimate(ClimateDevice):
 
     def set_fan_mode(self, fan_mode):
         """Set new target fan mode."""
-        self._api.set_speed(HA_FAN_TO_SAMSUNG[fan_mode.title()])
+        self._api.set_speed(HA_FAN_TO_SAMSUNG[fan_mode.lower()])
 
     def set_swing_mode(self, swing_mode):
         """Set new target swing operation."""
-        self._api.set_direction(HA_SWING_TO_SAMSUNG[swing_mode.title()])
+        self._api.set_direction(HA_SWING_TO_SAMSUNG[swing_mode.lower()])
 
     def update(self):
         data = self._api.get()
@@ -251,7 +251,7 @@ class SamsungClimate(ClimateDevice):
         self._temperature_min = data['Device']['Temperatures'][0]['minimum']
         self._temperature_max = data['Device']['Temperatures'][0]['maximum']
 
-        self._current_operation = data['Device']['Mode']['modes'][0].title()
+        self._current_operation = data['Device']['Mode']['modes'][0].lower()
 
-        self._current_swing = data['Device']['Wind']['direction'].title()
+        self._current_swing = data['Device']['Wind']['direction'].lower()
         self._current_fan = int(data['Device']['Wind']['speedLevel'])
