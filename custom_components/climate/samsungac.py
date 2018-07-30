@@ -1,5 +1,5 @@
 '''
-Support for samsung AR09MSPXBWKNER.
+Support for samsung AC.
 
 @author: semjef
 '''
@@ -77,7 +77,7 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
         cert = config.get(CONF_CERT_FILE)
         token = config.get(CONF_TOKEN)
 
-    api = samsungac_api_setup(host, port, cert, token)
+    api = samsungac_api_setup(hass, host, port, cert, token)
     add_devices([SamsungClimate(api)], True)
 
 
@@ -112,7 +112,7 @@ class SamsungClimate(ClimateDevice):
 
     @property
     def name(self):
-        """Return the name of the lyric, if any."""
+        """Return the name, if any."""
         return self._name
 
     @property

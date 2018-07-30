@@ -1,5 +1,5 @@
 '''
-Support for samsung AR09MSPXBWKNER.
+Support for samsung Air Conditioner AR09MSPXBWKNER.
 
 @author: semjef
 '''
