@@ -19,9 +19,8 @@ from homeassistant.const import (
     CONF_IP_ADDRESS, CONF_TOKEN, CONF_PORT, ATTR_ENTITY_ID, ATTR_TEMPERATURE,
     CONF_SCAN_INTERVAL, STATE_ON, STATE_OFF, STATE_UNKNOWN,
     TEMP_CELSIUS, TEMP_FAHRENHEIT)
+from custom_components.samsungac import CONF_CERT_FILE, samsungac_api_setup
 
-REQUIREMENTS = [
-    'https://github.com/semjef/samsungac/archive/0.6.6.zip#samsungac==0.6.6']
 _LOGGER = logging.getLogger(__name__)
 
 SUPPORT_FLAGS = (SUPPORT_TARGET_TEMPERATURE |
@@ -29,8 +28,6 @@ SUPPORT_FLAGS = (SUPPORT_TARGET_TEMPERATURE |
                  SUPPORT_SWING_MODE |
                  SUPPORT_FAN_MODE |
                  SUPPORT_ON_OFF)
-
-CONF_CERT_FILE = 'cert'
 
 HA_STATE_TO_SAMSUNG = {
     STATE_AUTO: 'auto',
@@ -69,14 +66,18 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
 
 
 def setup_platform(hass, config, add_devices, discovery_info=None):
-    import samsungac
+    if discovery_info is not None:
+        host = discovery_info.get(CONF_IP_ADDRESS)
+        port = discovery_info.get(CONF_PORT)
+        cert = discovery_info.get(CONF_CERT_FILE)
+        token = discovery_info.get(CONF_TOKEN)
+    else:
+        host = config.get(CONF_IP_ADDRESS)
+        port = config.get(CONF_PORT)
+        cert = config.get(CONF_CERT_FILE)
+        token = config.get(CONF_TOKEN)
 
-    host = config.get(CONF_IP_ADDRESS)
-    port = config.get(CONF_PORT)
-    cert = config.get(CONF_CERT_FILE)
-    token = config.get(CONF_TOKEN)
-
-    api = samsungac.Entity(host, port, cert, token)
+    api = samsungac_api_setup(host, port, cert, token)
     add_devices([SamsungClimate(api)], True)
 
 
@@ -142,6 +143,11 @@ class SamsungClimate(ClimateDevice):
     def supported_features(self):
         """Return the list of supported features."""
         return SUPPORT_FLAGS
+
+    @property
+    def device_class(self):
+        """Return the class of this device, from component DEVICE_CLASSES."""
+        return 'AC'
 
     @property
     def temperature_unit(self):
