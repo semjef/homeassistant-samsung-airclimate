@@ -34,10 +34,10 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
         token = config.get(CONF_TOKEN)
 
     api = samsungac_api_setup(hass, host, port, cert, token)
-    add_devices([SamsungSwitch(api)], True)
+    add_devices([SamsungWindSwitch(api), SamsungSpiSwitch(api)], True)
 
 
-class SamsungSwitch(SwitchDevice):
+class SamsungWindSwitch(SwitchDevice):
     def __init__(self, api):
         self._api = api
 
@@ -71,5 +71,45 @@ class SamsungSwitch(SwitchDevice):
 
     def update(self):
         data = self._api.get()
-        self._name = data['Device']['name']
-        self._is_on = 'Comode_Nano' in data['Device']['Mode']['options']
+        self._name = "{} Wind".format(data['Device']['name'])
+        self._is_on = ('Comode_Nano' in data['Device']['Mode']['options'] and
+                       data['Device']['Operation']['power'] == 'On')
+
+
+class SamsungSpiSwitch(SwitchDevice):
+    def __init__(self, api):
+        self._api = api
+
+        self._name = None
+        self._is_on = None
+
+    @property
+    def name(self):
+        """Return the name of the device if any."""
+        return self._name
+
+    @property
+    def is_on(self):
+        """Return true if on."""
+        return self._is_on
+
+    def turn_on(self):
+        """Turn device on."""
+        self._api.spi(True)
+
+    def turn_off(self):
+        """Turn device off."""
+        self._api.spi(False)
+
+    @property
+    def icon(self):
+        """Return the icon to use in the frontend, if any."""
+        if self._is_on:
+            return 'mdi:power-on'
+        return 'mdi:power-off'
+
+    def update(self):
+        data = self._api.get()
+        self._name = "{} Spi".format(data['Device']['name'])
+        self._is_on = ('Spi_On' in data['Device']['Mode']['options'] and
+                       data['Device']['Operation']['power'] == 'On')
