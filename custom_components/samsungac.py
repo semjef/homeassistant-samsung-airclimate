@@ -23,7 +23,7 @@ DOMAIN = 'samsungac'
 CONF_ACS = 'acs'
 CONF_CERT_FILE = 'cert'
 
-COMPONENT_TYPES = ['climate', 'sensor']
+COMPONENT_TYPES = ['climate', 'switch']
 
 AC_CONFIG = vol.Schema({
     vol.Required(CONF_IP_ADDRESS): cv.string,
