@@ -7,17 +7,15 @@ Support for samsung AC.
 import logging
 import voluptuous as vol
 import homeassistant.helpers.config_validation as cv
-from homeassistant.util.temperature import convert as convert_temperature
-from homeassistant.components.climate import (
-    ATTR_FAN_MODE, ATTR_SWING_MODE, DOMAIN,
-    ClimateDevice, PLATFORM_SCHEMA, STATE_DRY, STATE_AUTO,
+from homeassistant.components.climate import ClimateDevice, PLATFORM_SCHEMA
+from homeassistant.components.climate.const import (
+    ATTR_FAN_MODE, ATTR_SWING_MODE, STATE_DRY, STATE_AUTO,
     STATE_COOL, STATE_FAN_ONLY, STATE_HEAT, SUPPORT_TARGET_TEMPERATURE,
-    SUPPORT_ON_OFF, SUPPORT_TARGET_TEMPERATURE_LOW,
-    SUPPORT_OPERATION_MODE, SUPPORT_SWING_MODE, SUPPORT_FAN_MODE,
+    SUPPORT_ON_OFF, SUPPORT_OPERATION_MODE, SUPPORT_SWING_MODE, SUPPORT_FAN_MODE,
     ATTR_OPERATION_MODE)
 from homeassistant.const import (
-    CONF_IP_ADDRESS, CONF_TOKEN, CONF_PORT, ATTR_ENTITY_ID, ATTR_TEMPERATURE,
-    CONF_SCAN_INTERVAL, STATE_ON, STATE_OFF, STATE_UNKNOWN,
+    CONF_IP_ADDRESS, CONF_TOKEN, CONF_PORT, ATTR_TEMPERATURE,
+    STATE_ON, STATE_OFF, STATE_UNKNOWN,
     TEMP_CELSIUS, TEMP_FAHRENHEIT)
 from custom_components.samsungac import CONF_CERT_FILE, samsungac_api_setup
 

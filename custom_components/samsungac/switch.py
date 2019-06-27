@@ -4,7 +4,6 @@ Support for samsung AC.
 @author: semjef
 '''
 
-import logging
 import voluptuous as vol
 import homeassistant.helpers.config_validation as cv
 from homeassistant.components.switch import (
