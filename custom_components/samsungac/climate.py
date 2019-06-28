@@ -229,7 +229,7 @@ class SamsungClimate(ClimateDevice):
 
     def set_operation_mode(self, operation_mode):
         """Set new target operation mode."""
-        self._api.set_mode(HA_STATE_TO_SAMSUNG[operation_mode.lower()])
+        self._api.set_mode(HA_STATE_TO_SAMSUNG[operation_mode.lower()].capitalize())
 
     def set_fan_mode(self, fan_mode):
         """Set new target fan mode."""
@@ -237,7 +237,7 @@ class SamsungClimate(ClimateDevice):
 
     def set_swing_mode(self, swing_mode):
         """Set new target swing operation."""
-        self._api.set_direction(HA_SWING_TO_SAMSUNG[swing_mode.lower()])
+        self._api.set_direction(HA_SWING_TO_SAMSUNG[swing_mode.lower()].capitalize())
 
     def update(self):
         data = self._api.get()
